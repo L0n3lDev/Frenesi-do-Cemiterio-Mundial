@@ -1,16 +1,28 @@
 package;
 
+import Note.Note;
 import flixel.FlxState;
 import Paths.Paths;
 import flixel.FlxSprite;
 import flixel.FlxG;
+import flixel.math.FlxMath;
 import flixel.group.FlxGroup.FlxTypedGroup;
+import Song.TpfSong;
+import Section.TpfSection;
 
-class PlayState extends FlxState
+class PlayState extends MusicBeatState
 {
 	var player:FlxSprite;
+
+	public static var song:TpfSong;
+
+	//strums
 	var strumGrp:FlxTypedGroup<FlxSprite>;
 	var strums:FlxSprite;
+
+	//Notes
+	var noteGrp:FlxTypedGroup<Note>;
+	var note:Note;
 
 	override public function create()
 	{
@@ -42,12 +54,59 @@ class PlayState extends FlxState
 			strums.animation.play('idle');
 			strumGrp.add(strums);
 		}
-		
+
+		if (song == null){
+			song = Song.loadJson('Test');
+		}
+
+		getSong();
+
+		//play music :)
+		FlxG.sound.playMusic(Paths.music('Test'));		
+	}
+	
+	function getSong()
+	{
+		var songData = song;
+
+		// adding the Notes
+		noteGrp = new FlxTypedGroup<Note>();
+		add(noteGrp);
+
+		var noteData:Array<TpfSection>;
+
+		noteData = songData.notes;
+
+		for (section in noteData)
+		{
+			for (songNotes in section.sectionNotes)
+			{
+				var daStrumTime:Float = songNotes[0];
+				if (daStrumTime < 0)
+					daStrumTime = 0;
+				var daNoteData:Int = Std.int(songNotes[1] % 2);
+
+				note = new Note(daStrumTime, daNoteData);
+
+				noteGrp.add(note);
+			}
+		}
 	}
 
 	override public function update(elapsed:Float)
 	{
 		super.update(elapsed);
+		Conductor.songPosition = FlxG.sound.music.time;
+
+		//debug
+		if(FlxG.keys.justPressed.SEVEN){
+			FlxG.switchState(new ChartingState());
+		}
+
+		//update note pos
+		noteGrp.forEachAlive(function(daNote:Note){
+			daNote.x = (strumGrp.members[Math.floor(Math.abs(daNote.noteData))].x - 0.45 * (Conductor.songPosition - daNote.strumTime) * FlxMath.roundDecimal(song.speed, 2));
+		});
 
 		controls();
 	}

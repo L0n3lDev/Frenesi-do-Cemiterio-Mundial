@@ -18,4 +18,14 @@ class Paths
     {
         return getPath('images', type, file, 'png');
     }
+
+    static public function music(song:String)
+    {
+        return getPath('songs', song, song, 'ogg');
+    }
+
+	static public function json(song:String)
+	{
+		return getPath('songs', song, song, 'json');
+	}
 }
