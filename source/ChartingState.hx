@@ -63,7 +63,6 @@ class ChartingState extends MusicBeatState
         }
 
         gridBG = FlxGridOverlay.create(gridSize, gridSize, gridSize * 16, gridSize * 2);
-        gridBG.screenCenter(Y);
         add(gridBG);
 
         addedNotes = new FlxTypedGroup<Note>();
@@ -73,8 +72,8 @@ class ChartingState extends MusicBeatState
         addSection();
         updateGrid();
         loadSong(_song.name);
-        //Conductor.changeBPM(_song.bpm);
-        //Conductor.mapBPMChanges(_song);
+        Conductor.changeBPM(_song.bpm);
+        Conductor.mapBPMChanges(_song);
 
         strumLine = new FlxSprite().makeGraphic(4, FlxG.width);
         add(strumLine);
@@ -94,6 +93,7 @@ class ChartingState extends MusicBeatState
             lengthInSteps: lengthInSteps,
             runnerSection: false,
             bpm: _song.bpm,
+            changeBPM: false
         }
         _song.notes.push(sec);
     }

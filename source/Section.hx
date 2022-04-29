@@ -10,6 +10,7 @@ typedef TpfSection =
 	var lengthInSteps:Int;
     var runnerSection:Bool;
 	var bpm:Float;
+    var changeBPM:Bool;
 }
 
 class Section
